@@ -1,0 +1,20 @@
+{
+  "name": "ASN1",
+  "displayname": "ASN.1 decoder/encoder",
+  "version": "0.0.1",
+  "unity": "2021.3",
+  "description": "ASN.1 decoder and encoder for common uses, like space efficient and portable serializazion",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willneedit/Unity-asn1-package.git"
+  },
+  "keywords": [
+    "Sample"
+  ],
+  "author": "various",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/willneedit/Unity-asn1-package/issues"
+  },
+  "homepage": "https://github.com/willneedit/Unity-asn1-package#readme"
+}

@@ -8,7 +8,7 @@
 /[Aa]ssets/*
 
 # !! The real project root. !!
-!/[Aa]ssets/Sample-Project*
+!/[Aa]ssets/ASN1*
 
 # The asset store loader to guide the new user to download (or, purchase as
 # it needs) and include the project's working tree, not into this repository.

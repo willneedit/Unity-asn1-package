@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PKG_ROOT=Assets/Sample-Project
+PKG_ROOT=Assets/ASN1
 
 git branch -D tmp &> /dev/null || echo "tmp branch not found (but it's okay)"
 git branch -D package &> /dev/null || echo "package branch not found (but it's okay)"
