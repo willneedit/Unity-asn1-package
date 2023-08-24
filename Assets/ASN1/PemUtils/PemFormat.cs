@@ -21,14 +21,6 @@ namespace PemUtils
             _type = type;
         }
 
-        public override bool Equals(object obj)
-        {
-            if(obj is not PemFormat other) return false;
-            return string.Equals(_type, other._type, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public override int GetHashCode() => base.GetHashCode();
-
         public override string ToString() => _type;
 
         public static PemFormat Parse(string typeString)

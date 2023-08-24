@@ -98,9 +98,16 @@ namespace PemUtils
 
         private static BigInteger ToBigInteger(byte[] data)
         {
-            byte[] extendedData = new byte[data.Length + 1];
-            data.CopyTo(extendedData, 1);
-            return new BigInteger(extendedData.Reverse().ToArray());
+            // BigInteger needs to be little endian, the RSA parameters _are_ big endian.
+            if((data?.Length ?? 0) > 0 && data[0] >= 0x80)
+            {
+                // Add a leading zero byte to denote the value as unsigned if needed
+                byte[] extendedData = new byte[data.Length + 1];
+                data.CopyTo(extendedData, 1);
+                data = extendedData;
+            }
+
+            return new BigInteger(data.Reverse().ToArray());
         }
 
         private static BitArray ToBitArray(byte[] data)

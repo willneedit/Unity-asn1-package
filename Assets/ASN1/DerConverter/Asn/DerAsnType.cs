@@ -17,7 +17,7 @@ namespace DerConverter.Asn
         public abstract byte[] Encode(IDerAsnEncoder encoder);
     }
 
-    public abstract class DerAsnType<TValue> : DerAsnType
+    public abstract class DerAsnType<T> : DerAsnType
     {
         protected DerAsnType(IDerAsnDecoder decoder, DerAsnIdentifier identifier, Queue<byte> rawData)
             : base(identifier)
@@ -25,23 +25,23 @@ namespace DerConverter.Asn
             Value = DecodeValue(decoder, rawData);
         }
 
-        protected DerAsnType(DerAsnIdentifier identifier, TValue value)
+        protected DerAsnType(DerAsnIdentifier identifier, T value)
             : base(identifier)
         {
             Value = value;
         }
 
-        public new TValue Value
+        public new T Value
         {
-            get { return (TValue)base.Value; }
+            get { return (T) base.Value; }
             set { base.Value = value; }
         }
 
         public override byte[] Encode(IDerAsnEncoder encoder)
             => EncodeValue(encoder, Value).ToArray();
 
-        protected abstract TValue DecodeValue(IDerAsnDecoder decoder, Queue<byte> rawData);
+        protected abstract T DecodeValue(IDerAsnDecoder decoder, Queue<byte> rawData);
 
-        protected abstract IEnumerable<byte> EncodeValue(IDerAsnEncoder encoder, TValue value);
+        protected abstract IEnumerable<byte> EncodeValue(IDerAsnEncoder encoder, T value);
     }
 }

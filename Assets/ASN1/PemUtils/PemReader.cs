@@ -91,24 +91,24 @@ namespace PemUtils
         {
             if(der == null) throw new ArgumentNullException(nameof(der));
             if(der is not DerAsnContext outerSequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
-            if(outerSequence.Value.Length != 2) throw new InvalidOperationException("Outer sequence must contain 2 parts");
+            if(outerSequence.Length != 2) throw new InvalidOperationException("Outer sequence must contain 2 parts");
 
-            if(outerSequence.Value[0] is not DerAsnContext headerSequence) throw new InvalidOperationException("First part of outer sequence must be another sequence (the header sequence)");
-            if(headerSequence.Value.Length != 2) throw new InvalidOperationException("The header sequence must contain 2 parts");
-            if(headerSequence.Value[0] is not DerAsnObjectIdentifier objectIdentifier) throw new InvalidOperationException("First part of header sequence must be an object-identifier");
+            if(outerSequence[0] is not DerAsnContext headerSequence) throw new InvalidOperationException("First part of outer sequence must be another sequence (the header sequence)");
+            if(headerSequence.Length != 2) throw new InvalidOperationException("The header sequence must contain 2 parts");
+            if(headerSequence[0] is not DerAsnObjectIdentifier objectIdentifier) throw new InvalidOperationException("First part of header sequence must be an object-identifier");
             if(!Enumerable.SequenceEqual(objectIdentifier.Value, RsaIdentifier)) throw new InvalidOperationException($"RSA object-identifier expected 1.2.840.113549.1.1.1, got: {string.Join(".", objectIdentifier.Value.Select(x => x.ToString()))}");
-            if(headerSequence.Value[1] is not DerAsnNull) throw new InvalidOperationException("Second part of header sequence must be a null");
+            if(headerSequence[1] is not DerAsnNull) throw new InvalidOperationException("Second part of header sequence must be a null");
 
-            if(outerSequence.Value[1] is not DerAsnBitString innerSequenceBitString) throw new InvalidOperationException("Second part of outer sequence must be a bit-string");
+            if(outerSequence[1] is not DerAsnBitString innerSequenceBitString) throw new InvalidOperationException("Second part of outer sequence must be a bit-string");
 
             byte[] innerSequenceData = innerSequenceBitString.ToByteArray();
             if(DerConvert.Decode(innerSequenceData) is not DerAsnContext innerSequence) throw new InvalidOperationException("Could not decode the bit-string as a sequence");
-            if(innerSequence.Value.Length < 2) throw new InvalidOperationException("Inner sequence must at least contain 2 parts (modulus and exponent)");
+            if(innerSequence.Length < 2) throw new InvalidOperationException("Inner sequence must at least contain 2 parts (modulus and exponent)");
 
             return new RSAParameters
             {
-                Modulus = GetIntegerData(innerSequence.Value[0]),
-                Exponent = GetIntegerData(innerSequence.Value[1])
+                Modulus = GetIntegerData(innerSequence[0]),
+                Exponent = GetIntegerData(innerSequence[1])
             };
         }
 
@@ -116,34 +116,36 @@ namespace PemUtils
         {
             if(der == null) throw new ArgumentNullException(nameof(der));
             if(der is not DerAsnContext sequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
-            if(sequence.Value.Length != 9) throw new InvalidOperationException("Sequence must contain 9 parts");
+            if(sequence.Length != 9) throw new InvalidOperationException("Sequence must contain 9 parts");
             return new RSAParameters
             {
-                Modulus = GetIntegerData(sequence.Value[1]),
-                Exponent = GetIntegerData(sequence.Value[2]),
-                D = GetIntegerData(sequence.Value[3]),
-                P = GetIntegerData(sequence.Value[4]),
-                Q = GetIntegerData(sequence.Value[5]),
-                DP = GetIntegerData(sequence.Value[6]),
-                DQ = GetIntegerData(sequence.Value[7]),
-                InverseQ = GetIntegerData(sequence.Value[8]),
+                // Version = GetIndegerData(sequence[0]); 
+                Modulus = GetIntegerData(sequence[1]),
+                Exponent = GetIntegerData(sequence[2]),
+                D = GetIntegerData(sequence[3]),
+                P = GetIntegerData(sequence[4]),
+                Q = GetIntegerData(sequence[5]),
+                DP = GetIntegerData(sequence[6]),
+                DQ = GetIntegerData(sequence[7]),
+                InverseQ = GetIntegerData(sequence[8]),
             };
         }
         private static RSAParameters ReadRSAPrivateKey(DerAsnType der)
         {
             if(der == null) throw new ArgumentNullException(nameof(der));
             if(der is not DerAsnContext sequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
-            if(sequence.Value.Length != 9) throw new InvalidOperationException("Sequence must contain 9 parts");
+            if(sequence.Length != 9) throw new InvalidOperationException("Sequence must contain 9 parts");
             return new RSAParameters
             {
-                Modulus = GetIntegerData(sequence.Value[1]),
-                Exponent = GetIntegerData(sequence.Value[2]),
-                D = GetIntegerData(sequence.Value[3]),
-                P = GetIntegerData(sequence.Value[4]),
-                Q = GetIntegerData(sequence.Value[5]),
-                DP = GetIntegerData(sequence.Value[6]),
-                DQ = GetIntegerData(sequence.Value[7]),
-                InverseQ = GetIntegerData(sequence.Value[8]),
+                // Version = GetIndegerData(sequence[0]); 
+                Modulus = GetIntegerData(sequence[1]),
+                Exponent = GetIntegerData(sequence[2]),
+                D = GetIntegerData(sequence[3]),
+                P = GetIntegerData(sequence[4]),
+                Q = GetIntegerData(sequence[5]),
+                DP = GetIntegerData(sequence[6]),
+                DQ = GetIntegerData(sequence[7]),
+                InverseQ = GetIntegerData(sequence[8]),
             };
         }
 

@@ -22,7 +22,7 @@ namespace DerConverter.Asn.KnownTypes
 
         protected override DerAsnType[] DecodeValue(IDerAsnDecoder decoder, Queue<byte> rawData)
         {
-            var items = new List<DerAsnType>();
+            List<DerAsnType> items = new();
             while (rawData.Any()) items.Add(decoder.Decode(rawData));
             return items.ToArray();
         }
@@ -34,5 +34,9 @@ namespace DerConverter.Asn.KnownTypes
                 .SelectMany(x => x)
                 .ToArray();
         }
+
+        public DerAsnType this[int index] => Value[index];
+
+        public int Length => Value.Length;
     }
 }
