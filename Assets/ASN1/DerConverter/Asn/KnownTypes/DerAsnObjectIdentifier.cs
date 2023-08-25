@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DerConverter.Asn.KnownTypes
 {
-    public class DerAsnObjectIdentifier : DerAsnType<int[]>
+    public class DerAsnObjectIdentifier : DerAsnType<int[]>, IEquatable<DerAsnObjectIdentifier>
     {
         internal DerAsnObjectIdentifier(IDerAsnDecoder decoder, DerAsnIdentifier identifier, Queue<byte> rawData)
             : base(decoder, identifier, rawData)
@@ -70,6 +70,27 @@ namespace DerConverter.Asn.KnownTypes
             }
             result.Reverse();
             return result.ToArray();
+        }
+
+        public bool Equals(DerAsnObjectIdentifier other) => other is not null && EqualityComparer<DerAsnIdentifier>.Default.Equals(Identifier, other.Identifier) && EqualityComparer<object>.Default.Equals(Value, other.Value) && EqualityComparer<int[]>.Default.Equals(Value, other.Value);
+        public override int GetHashCode() => HashCode.Combine(Value);
+
+        public static bool operator ==(DerAsnObjectIdentifier left, DerAsnObjectIdentifier right) => EqualityComparer<DerAsnObjectIdentifier>.Default.Equals(left, right);
+        public static bool operator !=(DerAsnObjectIdentifier left, DerAsnObjectIdentifier right) => !(left == right);
+        public static bool operator ==(DerAsnObjectIdentifier left, int[] right) => left.Equals(right);
+        public static bool operator !=(DerAsnObjectIdentifier left, int[] right) => !(left == right);
+
+
+        public bool Equals(int[] clearOID)
+        {
+            int[] myOID = Value;
+            return myOID.SequenceEqual(clearOID);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(!(obj is int[] clearOID)) return false;
+            return Equals(clearOID);
         }
     }
 }

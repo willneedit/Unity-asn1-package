@@ -92,7 +92,7 @@ namespace PemUtils
             if(outerSequence[0] is not DerAsnSequence headerSequence) throw new InvalidOperationException("First part of outer sequence must be another sequence (the header sequence)");
             if(headerSequence.Length != 2) throw new InvalidOperationException("The header sequence must contain 2 parts");
             if(headerSequence[0] is not DerAsnObjectIdentifier objectIdentifier) throw new InvalidOperationException("First part of header sequence must be an object-identifier");
-            if(!Enumerable.SequenceEqual(objectIdentifier.Value, RsaIdentifier)) throw new InvalidOperationException($"RSA object-identifier expected 1.2.840.113549.1.1.1, got: {string.Join(".", objectIdentifier.Value.Select(x => x.ToString()))}");
+            if(objectIdentifier != RsaIdentifier) throw new InvalidOperationException($"RSA object-identifier expected 1.2.840.113549.1.1.1, got: {string.Join(".", objectIdentifier.Value.Select(x => x.ToString()))}");
             if(headerSequence[1] is not DerAsnNull) throw new InvalidOperationException("Second part of header sequence must be a null");
 
             if(outerSequence[1] is not DerAsnBitString innerSequenceBitString) throw new InvalidOperationException("Second part of outer sequence must be a bit-string");
@@ -160,8 +160,5 @@ namespace PemUtils
             public string Footer { get; set; }
             public string Format { get; set; }   //tcj
         }
-
-        public string OID2String(int[] bytesIn) 
-            => String.Join(",", bytesIn);
     }
 }
