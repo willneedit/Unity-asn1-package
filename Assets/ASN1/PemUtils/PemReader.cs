@@ -16,19 +16,15 @@ namespace PemUtils
         private readonly Stream _stream;
         private readonly bool _disposeStream;
         private readonly Encoding _encoding;
-        protected DefaultDerAsnDecoder _decoder = null;
+
         protected string lastOID = "";
-        public static Func<IDerAsnDecoder> ExpandedDecoder { get; set; } = () => new DefaultDerAsnDecoder();
-        //   protected ExpandedDecoder decoder;
+
 
         public PemReader(Stream stream, bool disposeStream = false, Encoding encoding = null)
         {
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
             _disposeStream = disposeStream;
             _encoding = encoding ?? Encoding.UTF8;
-            if(ExpandedDecoder == null) throw new ArgumentNullException(nameof(ExpandedDecoder));
-            //       var decoder = ExpandedDecoder();
-            //      decoder.RegisterType(DerAsnEncodingType.Constructed, DerAsnKnownTypeTags.Constructed.Sequence, (decoder, identifier, data) => new DerAsnSequence(decoder, identifier, data));
         }
 
         public void Dispose()
