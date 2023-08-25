@@ -14,10 +14,11 @@ namespace DerConverter.Asn.KnownTypes
         {
         }
 
-        public DerAsnContext(long tag, DerAsnType value)
+        public DerAsnContext(long tag, bool expl, DerAsnType value)
             : base(new DerAsnIdentifier(
-                DerAsnTagClass.ContextSpecific, 
-                DerAsnEncodingType.Constructed, tag), value)
+                DerAsnTagClass.ContextSpecific, expl 
+                ? DerAsnEncodingType.Constructed
+                : DerAsnEncodingType.Primitive, tag), value)
         {
         }
 
