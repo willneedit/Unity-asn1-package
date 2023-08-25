@@ -90,10 +90,10 @@ namespace PemUtils
         private static RSAParameters ReadPublicKey(DerAsnType der)
         {
             if(der == null) throw new ArgumentNullException(nameof(der));
-            if(der is not DerAsnContext outerSequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
+            if(der is not DerAsnSequence outerSequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
             if(outerSequence.Length != 2) throw new InvalidOperationException("Outer sequence must contain 2 parts");
 
-            if(outerSequence[0] is not DerAsnContext headerSequence) throw new InvalidOperationException("First part of outer sequence must be another sequence (the header sequence)");
+            if(outerSequence[0] is not DerAsnSequence headerSequence) throw new InvalidOperationException("First part of outer sequence must be another sequence (the header sequence)");
             if(headerSequence.Length != 2) throw new InvalidOperationException("The header sequence must contain 2 parts");
             if(headerSequence[0] is not DerAsnObjectIdentifier objectIdentifier) throw new InvalidOperationException("First part of header sequence must be an object-identifier");
             if(!Enumerable.SequenceEqual(objectIdentifier.Value, RsaIdentifier)) throw new InvalidOperationException($"RSA object-identifier expected 1.2.840.113549.1.1.1, got: {string.Join(".", objectIdentifier.Value.Select(x => x.ToString()))}");
@@ -102,7 +102,7 @@ namespace PemUtils
             if(outerSequence[1] is not DerAsnBitString innerSequenceBitString) throw new InvalidOperationException("Second part of outer sequence must be a bit-string");
 
             byte[] innerSequenceData = innerSequenceBitString.ToByteArray();
-            if(DerConvert.Decode(innerSequenceData) is not DerAsnContext innerSequence) throw new InvalidOperationException("Could not decode the bit-string as a sequence");
+            if(DerConvert.Decode(innerSequenceData) is not DerAsnSequence innerSequence) throw new InvalidOperationException("Could not decode the bit-string as a sequence");
             if(innerSequence.Length < 2) throw new InvalidOperationException("Inner sequence must at least contain 2 parts (modulus and exponent)");
 
             return new RSAParameters
@@ -115,7 +115,7 @@ namespace PemUtils
         private static RSAParameters ReadPrivateKey(DerAsnType der)
         {
             if(der == null) throw new ArgumentNullException(nameof(der));
-            if(der is not DerAsnContext sequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
+            if(der is not DerAsnSequence sequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
             if(sequence.Length != 9) throw new InvalidOperationException("Sequence must contain 9 parts");
             return new RSAParameters
             {
@@ -133,7 +133,7 @@ namespace PemUtils
         private static RSAParameters ReadRSAPrivateKey(DerAsnType der)
         {
             if(der == null) throw new ArgumentNullException(nameof(der));
-            if(der is not DerAsnContext sequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
+            if(der is not DerAsnSequence sequence) throw new ArgumentException($"{nameof(der)} is not a sequence");
             if(sequence.Length != 9) throw new InvalidOperationException("Sequence must contain 9 parts");
             return new RSAParameters
             {

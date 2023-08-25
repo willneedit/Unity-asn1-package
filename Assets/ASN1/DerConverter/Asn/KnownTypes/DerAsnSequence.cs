@@ -3,19 +3,19 @@ using System.Linq;
 
 namespace DerConverter.Asn.KnownTypes
 {
-    public class DerAsnContext : DerAsnType<DerAsnType[]>
+    public class DerAsnSequence : DerAsnType<DerAsnType[]>
     {
-        public DerAsnContext(IDerAsnDecoder decoder, DerAsnIdentifier identifier, Queue<byte> rawData)  // to public 210707
+        public DerAsnSequence(IDerAsnDecoder decoder, DerAsnIdentifier identifier, Queue<byte> rawData)  // to public 210707
             : base(decoder, identifier, rawData)
         {
         }
 
-        public DerAsnContext(DerAsnIdentifier identifier, DerAsnType[] value)
+        public DerAsnSequence(DerAsnIdentifier identifier, DerAsnType[] value)
             : base(identifier, value)
         {
         }
 
-        public DerAsnContext(DerAsnType[] value)
+        public DerAsnSequence(DerAsnType[] value)
             : base(DerAsnIdentifiers.Constructed.Sequence, value)
         {
         }
