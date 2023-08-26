@@ -1,7 +1,7 @@
 # Unity ASN.1 package
 
-Derived from [PEM-utils](https://github.com/huysentruitw/pem-utils), this is a lightweight ASN.1 decoder and encoder in C#, tailored to Unity.
+Unity capable adaptation of the .NET System.Formats.An1, and some tools for importing and exporting of keys in the ASN.1 DER format.
 
 ## License
 
-The original work is licensed under the Apache-2.0 license, Copyright © 2017 Wouter Huysentruit.
+System.Formats.Asn1 Copyright (c) .NET Foundation and Contributors - [see License](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT)
