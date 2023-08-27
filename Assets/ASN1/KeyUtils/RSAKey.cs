@@ -1,11 +1,21 @@
 using System;
 using System.Diagnostics;
 using System.Formats.Asn1;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace ASN1
 {
     public static class Extensions
+    {
+        public static byte[] ExportDER(this RSA key, bool includePrivateParameters)
+            => DERExporter.WriteDER(key.ExportParameters(includePrivateParameters), includePrivateParameters);
+
+        public static void ImportDER(this RSA key, ArraySegment<byte> data)
+            => key.ImportParameters(DERExporter.ReadDER(data));
+    }
+
+    internal static class DERExporter
     {
         private const string oid_rsaEncryption = "1.2.840.113549.1.1.1";
 
@@ -31,37 +41,52 @@ namespace ASN1
         //             publicExponent    INTEGER   -- e
         //         }
 
-        internal static bool ReadRSAParameters(RSAParameters toRead, byte[] der)
+        internal static bool ReadRSAParameters(byte[] der, out RSAParameters toRead)
         {
+            toRead = new();
+
             AsnReader reader = new AsnReader(der, AsnEncodingRules.DER);
 
             bool expectedPrivate = false;
             AsnReader RSAKeySequence = reader.ReadSequence();
 
-            RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.Modulus);
+            toRead.Modulus = RSAKeySequence.ReadIntegerBytes().ToArray();
             // Public Key: Modulus & Exponent,
             // Private Key: All eight, prepended with the version integer (=0)
             if(toRead.Modulus.Length == 1 && toRead.Modulus[0] == 0)
             {
                 expectedPrivate = true;
                 // Discard the version and try to read the Modulus, again.
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.Modulus);
+                toRead.Modulus = RSAKeySequence.ReadIntegerBytes().ToArray();
             }
 
-            RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.Exponent);
+            toRead.Exponent = RSAKeySequence.ReadIntegerBytes().ToArray();
 
             // Private key material as following...
             if(expectedPrivate)
             {
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.D);
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.P);
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.Q);
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.DP);
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.DQ);
-                RSAKeySequence.ReadIntegerBytes().CopyTo(toRead.InverseQ);
+                toRead.D = RSAKeySequence.ReadIntegerBytes().ToArray();
+                toRead.P = RSAKeySequence.ReadIntegerBytes().ToArray();
+                toRead.Q = RSAKeySequence.ReadIntegerBytes().ToArray();
+                toRead.DP = RSAKeySequence.ReadIntegerBytes().ToArray();
+                toRead.DQ = RSAKeySequence.ReadIntegerBytes().ToArray();
+                toRead.InverseQ = RSAKeySequence.ReadIntegerBytes().ToArray();
             }
 
             return expectedPrivate;
+        }
+
+        internal static byte[] PruneUnsignedInteger(byte[] data)
+        {
+            // We've declared the INTEGER in this sense unsigned, and it's big endian,
+            // so we cut off the leading zeroes, regardless the leading nonzero byte
+            // being above 0x80 or not.
+            //
+            // And, leave it at least one byte. :)
+            int i = 0;
+            while(i < data.Length - 1 && data[i] == 0x00) i++;
+            if(i != 0) data = data.Skip(i).ToArray();
+            return data;
         }
 
         internal static byte[] WriteRSAParameters(RSAParameters toWrite, bool includePrivate)
@@ -73,17 +98,17 @@ namespace ASN1
                 if(includePrivate)
                     writer.WriteInteger(0); // Private only: Version 0
 
-                writer.WriteIntegerUnsigned(toWrite.Modulus);
-                writer.WriteIntegerUnsigned(toWrite.Exponent);
+                writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.Modulus));
+                writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.Exponent));
 
                 if(includePrivate)
                 {
-                    writer.WriteIntegerUnsigned(toWrite.D);
-                    writer.WriteIntegerUnsigned(toWrite.P);
-                    writer.WriteIntegerUnsigned(toWrite.Q);
-                    writer.WriteIntegerUnsigned(toWrite.DP);
-                    writer.WriteIntegerUnsigned(toWrite.DQ);
-                    writer.WriteIntegerUnsigned(toWrite.InverseQ);
+                    writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.D));
+                    writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.P));
+                    writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.Q));
+                    writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.DP));
+                    writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.DQ));
+                    writer.WriteIntegerUnsigned(PruneUnsignedInteger(toWrite.InverseQ));
                 }
             }
             writer.PopSequence();       // ... }
@@ -106,7 +131,7 @@ namespace ASN1
        //17:d=2  hl=2 l=   0 prim:   NULL
        //19:d=1  hl=4 l= 271 prim:  BIT STRING		-- DER coded[RSA] public key
 
-        public static bool ReadDER(this RSAParameters toRead, byte[] der)
+        public static RSAParameters ReadDER(ArraySegment<byte> der)
         {
             bool expectedPrivate = false;
 
@@ -140,16 +165,16 @@ namespace ASN1
                 else
                     encapsulated = sequence.ReadBitString(out int _);
 
-                bool priv2 = ReadRSAParameters(toRead, encapsulated);
+                bool priv2 = ReadRSAParameters(encapsulated, out RSAParameters toRead);
 
                 // Mismatch of the envelope with the embedded key material
                 Debug.Assert(expectedPrivate == priv2);
-            }
 
-            return expectedPrivate;
+                return toRead;
+            }
         }
 
-        public static byte[] WriteDER(this RSAParameters toWrite, bool includePrivate = false)
+        public static byte[] WriteDER(RSAParameters toWrite, bool includePrivate = false)
         {
             AsnWriter writer = new(AsnEncodingRules.DER);
 
@@ -176,4 +201,5 @@ namespace ASN1
             return writer.Encode();
         }
     }
+
 }
