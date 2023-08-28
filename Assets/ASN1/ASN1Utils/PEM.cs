@@ -2,9 +2,9 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ASN1
+namespace ASN1Utils
 {
-    internal static class PEMUtils
+    public static class PEM
     {
         public static byte[] ExtractPEM(string pem)
         {

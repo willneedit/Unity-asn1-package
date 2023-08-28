@@ -4,18 +4,18 @@ using System.Formats.Asn1;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace ASN1
+namespace ASN1Utils
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         public static byte[] ExportDER(this RSA key, bool includePrivateParameters)
-            => DERExporter.WriteDER(key.ExportParameters(includePrivateParameters), includePrivateParameters);
+            => DERExporter.WriteRSA(key.ExportParameters(includePrivateParameters), includePrivateParameters);
 
         public static void ImportDER(this RSA key, ArraySegment<byte> data)
-            => key.ImportParameters(DERExporter.ReadDER(data));
+            => key.ImportParameters(DERExporter.ReadRSA(data));
     }
 
-    internal static class DERExporter
+    internal static partial class DERExporter
     {
         private const string oid_rsaEncryption = "1.2.840.113549.1.1.1";
 
@@ -131,7 +131,7 @@ namespace ASN1
        //17:d=2  hl=2 l=   0 prim:   NULL
        //19:d=1  hl=4 l= 271 prim:  BIT STRING		-- DER coded[RSA] public key
 
-        public static RSAParameters ReadDER(ArraySegment<byte> der)
+        public static RSAParameters ReadRSA(ArraySegment<byte> der)
         {
             bool expectedPrivate = false;
 
@@ -174,7 +174,7 @@ namespace ASN1
             }
         }
 
-        public static byte[] WriteDER(RSAParameters toWrite, bool includePrivate = false)
+        public static byte[] WriteRSA(RSAParameters toWrite, bool includePrivate = false)
         {
             AsnWriter writer = new(AsnEncodingRules.DER);
 
