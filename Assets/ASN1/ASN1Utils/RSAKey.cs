@@ -11,8 +11,12 @@ namespace ASN1Utils
         public static byte[] ExportDER(this RSA key, bool includePrivateParameters)
             => DERExporter.WriteRSA(key.ExportParameters(includePrivateParameters), includePrivateParameters);
 
-        public static void ImportDER(this RSA key, ArraySegment<byte> data)
-            => key.ImportParameters(DERExporter.ReadRSA(data));
+    }
+
+    public static partial class DERImporter
+    {
+        public static RSA ImportDER_RSA(ArraySegment<byte> data)
+            => RSA.Create(DERExporter.ReadRSA(data));
     }
 
     internal static partial class DERExporter
@@ -41,7 +45,7 @@ namespace ASN1Utils
         //             publicExponent    INTEGER   -- e
         //         }
 
-        internal static bool ReadRSAParameters(byte[] der, out RSAParameters toRead)
+        internal static bool ReadRSAParameters(ArraySegment<byte> der, out RSAParameters toRead)
         {
             toRead = new();
 
