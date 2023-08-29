@@ -48,7 +48,7 @@ namespace ASN1Utils
         {
             AsnReader keyAlgo = sequenceReader.ReadSequence();
             string oid = keyAlgo.ReadObjectIdentifier();
-            if(oid != oid_ecPublicKey) throw new ArgumentException("Key is not an EC key");
+            if(oid != oid_ecPublicKey) throw new KeyMismatchException();
 
             ECParameters ecParameters = new ECParameters();
             ecParameters.Curve = ECCurve.CreateFromValue(keyAlgo.ReadObjectIdentifier());
@@ -60,7 +60,11 @@ namespace ASN1Utils
 
         private static ECParameters ReadECPrivateKey(AsnReader sequenceReader)
         {
-            sequenceReader.TryReadInt32(out int _);
+            sequenceReader.TryReadInt32(out int version);
+
+            // Could be the version 0 for a _RSA_ key...
+            if(version != 1) throw new KeyMismatchException();
+
             ECParameters ecParameters = new ECParameters()
             {
                 D = sequenceReader.ReadOctetString(),

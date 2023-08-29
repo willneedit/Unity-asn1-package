@@ -149,8 +149,8 @@ namespace ASN1Utils
                 if(sequence.PeekTag().HasSameClassAndValue(integer))
                 {
                     expectedPrivate = true;
-                    // Read the version for real, and discard.
-                    _ = sequence.ReadInteger();
+                    sequence.TryReadInt32(out int version);
+                    if(version != 0) throw new KeyMismatchException();
                 }
 
                 {
@@ -158,7 +158,7 @@ namespace ASN1Utils
 
                     // RSA: rsaEncryption ( 1.2.840.113549.1.1.1 )
                     string oid = keyAlgo.ReadObjectIdentifier();
-                    if(oid != oid_rsaEncryption) throw new ArgumentException("Key is not a RSA key");
+                    if(oid != oid_rsaEncryption) throw new KeyMismatchException();
 
                     // AlgorithmParameter SHALL be NULL.
                 }

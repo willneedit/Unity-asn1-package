@@ -87,7 +87,9 @@ public class RSA_DER_Import_Test : MonoBehaviour
         // We can import or export EC keys, but unless you include or reimplement ECC, you cannot work
         // with them.
 
-        // ECImportKeyTest();
+        ECImportKeyTest();
+
+        KeyMismatchTest();
     }
 
     void PEMConversionTest()
@@ -183,5 +185,32 @@ public class RSA_DER_Import_Test : MonoBehaviour
         }
 
         Debug.Log("EC import tests finished.");
+    }
+
+    private void KeyMismatchTest()
+    {
+        {
+            try
+            {
+                KeyImport.ImportDER(PEM.ExtractPEM(ref_ec_privkey), out RSA nokey);
+                Debug.LogError("No key mismatch where it's supposed to");
+            }
+            catch(KeyMismatchException)
+            {
+                // Okay for test
+            }
+        }
+
+        {
+            try
+            {
+                KeyImport.ImportDER(PEM.ExtractPEM(ref_ec_pubkey), out RSA nokey);
+                Debug.LogError("No key mismatch where it's supposed to");
+            }
+            catch(KeyMismatchException)
+            {
+                // Okay for test
+            }
+        }
     }
 }
