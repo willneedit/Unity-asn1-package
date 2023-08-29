@@ -7,25 +7,25 @@ namespace ASN1Utils
     public static partial class Extensions
     {
         public static byte[] ExportDER(this ECDsa key, bool includePrivateParameters)
-            => DERExporter.WriteEC(key.ExportParameters(includePrivateParameters), includePrivateParameters);
+            => KeyExport.WriteEC(key.ExportParameters(includePrivateParameters), includePrivateParameters);
 
         public static byte[] ExportDER(this ECDiffieHellman key, bool includePrivateParameters)
-            => DERExporter.WriteEC(key.ExportParameters(includePrivateParameters), includePrivateParameters);
+            => KeyExport.WriteEC(key.ExportParameters(includePrivateParameters), includePrivateParameters);
     }
 
-    public static partial class DERImporter
+    public static partial class KeyImport
     {
-        public static ECDsa ImportDER_ECDsa(ArraySegment<byte> data)
-            => ECDsa.Create(DERExporter.ReadEC(data));
+        public static void ImportDER(ArraySegment<byte> data, out ECDsa key)
+            => key = ECDsa.Create(KeyExport.ReadEC(data));
 
-        public static ECDiffieHellman ImportDER_ECDH(ArraySegment<byte> data)
-            => ECDiffieHellman.Create(DERExporter.ReadEC(data));
+        public static void ImportDER(ArraySegment<byte> data, out ECDiffieHellman key)
+            => key = ECDiffieHellman.Create(KeyExport.ReadEC(data));
 
         public static ECParameters ReadEC(ArraySegment<byte> data)
-            => DERExporter.ReadEC(data);
+            => KeyExport.ReadEC(data);
     }
 
-    internal static partial class DERExporter
+    internal static partial class KeyExport
     {
         private const string oid_ecPublicKey = "1.2.840.10045.2.1";
 

@@ -116,7 +116,7 @@ public class RSA_DER_Import_Test : MonoBehaviour
     void RSAImportKeyTest()
     {
         {
-            RSA key = DERImporter.ImportDER_RSA(PEM.ExtractPEM(ref_pem));
+            KeyImport.ImportDER(PEM.ExtractPEM(ref_pem), out RSA key);
 
             RSAParameters pars = key.ExportParameters(false);
 
@@ -125,7 +125,7 @@ public class RSA_DER_Import_Test : MonoBehaviour
         }
 
         {
-            RSA key = DERImporter.ImportDER_RSA(PEM.ExtractPEM(ref_privkey));
+            KeyImport.ImportDER(PEM.ExtractPEM(ref_privkey), out RSA key);
 
             RSAParameters pars = key.ExportParameters(true);
             if(pars.P == null || pars.P.Length == 0)
@@ -157,7 +157,7 @@ public class RSA_DER_Import_Test : MonoBehaviour
         }
 
         {
-            RSA blueprint = DERImporter.ImportDER_RSA(PEM.ExtractPEM(ref_privkey));
+            KeyImport.ImportDER(PEM.ExtractPEM(ref_privkey), out RSA blueprint);
 
             byte[] der = blueprint.ExportDER(true);
 
@@ -174,12 +174,12 @@ public class RSA_DER_Import_Test : MonoBehaviour
     private void ECImportKeyTest()
     {
         {
-            ECParameters key = DERImporter.ReadEC(PEM.ExtractPEM(ref_ec_pubkey));
+            ECParameters key = KeyImport.ReadEC(PEM.ExtractPEM(ref_ec_pubkey));
         }
 
 
         {
-            ECParameters key = DERImporter.ReadEC(PEM.ExtractPEM(ref_ec_privkey));
+            ECParameters key = KeyImport.ReadEC(PEM.ExtractPEM(ref_ec_privkey));
         }
 
         Debug.Log("EC import tests finished.");

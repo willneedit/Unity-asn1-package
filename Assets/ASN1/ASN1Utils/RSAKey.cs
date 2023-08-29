@@ -9,17 +9,17 @@ namespace ASN1Utils
     public static partial class Extensions
     {
         public static byte[] ExportDER(this RSA key, bool includePrivateParameters)
-            => DERExporter.WriteRSA(key.ExportParameters(includePrivateParameters), includePrivateParameters);
+            => KeyExport.WriteRSA(key.ExportParameters(includePrivateParameters), includePrivateParameters);
 
     }
 
-    public static partial class DERImporter
+    public static partial class KeyImport
     {
-        public static RSA ImportDER_RSA(ArraySegment<byte> data)
-            => RSA.Create(DERExporter.ReadRSA(data));
+        public static void ImportDER(ArraySegment<byte> data, out RSA key)
+            => key = RSA.Create(KeyExport.ReadRSA(data));
     }
 
-    internal static partial class DERExporter
+    internal static partial class KeyExport
     {
         private const string oid_rsaEncryption = "1.2.840.113549.1.1.1";
 
