@@ -1,7 +1,7 @@
 {
   "name": "ASN1",
   "displayname": "ASN.1 decoder/encoder",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "unity": "2021.3",
   "description": "ASN.1 decoder and encoder for common uses, like space efficient and portable serializazion",
   "repository": {
