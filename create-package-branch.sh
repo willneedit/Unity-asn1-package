@@ -2,14 +2,16 @@
 
 PKG_ROOT=Assets/ASN1
 
-git branch -D tmp &> /dev/null || echo "tmp branch not found (but it's okay)"
 git branch -D package &> /dev/null || echo "package branch not found (but it's okay)"
+git checkout -b package
+git clean -fdx
+git rm -rf "*"
+git restore --staged "${PKG_ROOT}"
+git restore "${PKG_ROOT}"
+git mv ${PKG_ROOT}/* .
+rm -rf "${PKG_ROOT}"
+git commit -am "Extracted package tree"
 
-hash=$(git show --format="%H (%s)" -s)
-git checkout --orphan tmp
-git commit -am "Orphaned from ${hash}"
-git subtree split -P "$PKG_ROOT" -b package
-git checkout package
 if [[ -d "Samples" ]]; then
   git mv Samples Samples~
   rm -f Samples.meta
