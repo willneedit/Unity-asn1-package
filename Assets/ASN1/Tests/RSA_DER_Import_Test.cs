@@ -18,9 +18,8 @@ public class RSA_DER_Import_Test : MonoBehaviour
 + "N6ELoonWDK+RMgYIBaZdgBhPfHxF8KfTHvSzcUzWZojuR+ynaFL9AJK+8RiXnB4C\n"
 + "JwIDAQAB\n"
 + "-----END PUBLIC KEY-----\n";
-
-    byte[] ref_modulus = Convert.FromBase64String("siLoIxmXaZAFRBKtHYZhiF8m+pYR+xGIpupvsdDEvKO92D6fIccgVLIW6p6sSNkoXx5J6KDSMbA/chy5M6pRvJkaCXCI4zlCPMYvPhI8OxN3RYPfdQTLpgPywrlfdn2CAum7o4D8nR4NJacB3NfPnS9tsJ2L3p5iHviuTB4xm03IKmPPqsaJy+nXUFC1XS9E/PseVHRuNvKa7WmlwSZngQzKAVSIwqpgCc+oP1pKEeJ0M3LHFo8ao5SuzhfXUIGrPnkUKEE3m7B0b8xXZfP1N6ELoonWDK+RMgYIBaZdgBhPfHxF8KfTHvSzcUzWZojuR+ynaFL9AJK+8RiXnB4CJw==");
-    byte[] ref_Exponent = Convert.FromBase64String("AQAB");
+    readonly byte[] ref_modulus = Convert.FromBase64String("siLoIxmXaZAFRBKtHYZhiF8m+pYR+xGIpupvsdDEvKO92D6fIccgVLIW6p6sSNkoXx5J6KDSMbA/chy5M6pRvJkaCXCI4zlCPMYvPhI8OxN3RYPfdQTLpgPywrlfdn2CAum7o4D8nR4NJacB3NfPnS9tsJ2L3p5iHviuTB4xm03IKmPPqsaJy+nXUFC1XS9E/PseVHRuNvKa7WmlwSZngQzKAVSIwqpgCc+oP1pKEeJ0M3LHFo8ao5SuzhfXUIGrPnkUKEE3m7B0b8xXZfP1N6ELoonWDK+RMgYIBaZdgBhPfHxF8KfTHvSzcUzWZojuR+ynaFL9AJK+8RiXnB4CJw==");
+    readonly byte[] ref_Exponent = Convert.FromBase64String("AQAB");
 
     // openssl genrsa |openssl rsa -pubout
     const string ref_privkey
@@ -110,7 +109,9 @@ public class RSA_DER_Import_Test : MonoBehaviour
 + "gQzKAVSIwqpgCc+oP1pKEeJ0M3LHFo8ao5SuzhfXUIGrPnkUKEE3m7B0b8xXZfP1"
 + "N6ELoonWDK+RMgYIBaZdgBhPfHxF8KfTHvSzcUzWZojuR+ynaFL9AJK+8RiXnB4C"
 + "JwIDAQAB")))
+        {
             Debug.LogError("PEM payload garbled");
+        }
 
         Debug.Log("PEM conversion tests finished.");
     }
@@ -176,12 +177,12 @@ public class RSA_DER_Import_Test : MonoBehaviour
     private void ECImportKeyTest()
     {
         {
-            ECParameters key = KeyImport.ReadEC(PEM.ExtractPEM(ref_ec_pubkey));
+            _ = KeyImport.ReadEC(PEM.ExtractPEM(ref_ec_pubkey));
         }
 
 
         {
-            ECParameters key = KeyImport.ReadEC(PEM.ExtractPEM(ref_ec_privkey));
+            _ = KeyImport.ReadEC(PEM.ExtractPEM(ref_ec_privkey));
         }
 
         Debug.Log("EC import tests finished.");

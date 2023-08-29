@@ -49,7 +49,7 @@ namespace ASN1Utils
         {
             toRead = new();
 
-            AsnReader reader = new AsnReader(der, AsnEncodingRules.DER);
+            AsnReader reader = new(der, AsnEncodingRules.DER);
 
             bool expectedPrivate = false;
             AsnReader RSAKeySequence = reader.ReadSequence();
@@ -163,11 +163,11 @@ namespace ASN1Utils
                     // AlgorithmParameter SHALL be NULL.
                 }
 
-                byte[] encapsulated = null;
+                byte[] encapsulated;
                 if(expectedPrivate)
                     encapsulated = sequence.ReadOctetString();
                 else
-                    encapsulated = sequence.ReadBitString(out int _);
+                    encapsulated = sequence.ReadBitString(out _);
 
                 bool priv2 = ReadRSAParameters(encapsulated, out RSAParameters toRead);
 
