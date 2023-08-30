@@ -8,7 +8,7 @@ namespace ASN1Utils
     {
         public static byte[] ExtractPEM(string pem)
         {
-            var match = Regex.Match(pem, @"^(?<header>\-+\s?BEGIN[^-]+\-+)\s*(?<body>[^-]+)\s*(?<footer>\-+\s?END[^-]+\-+)\s*$");
+            Match match = Regex.Match(pem, @"^(?<header>\-+\s?BEGIN[^-]+\-+)\s*(?<body>[^-]+)\s*(?<footer>\-+\s?END[^-]+\-+)\s*$");
 
             string value = match.Groups["body"].Value;
             return Convert.FromBase64String(Regex.Replace(value, @"\s+", string.Empty));
