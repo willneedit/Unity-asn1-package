@@ -4,24 +4,25 @@ using UnityEngine;
 
 using ASN1Compiler;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 public class ASN1CompilerTests : MonoBehaviour
 {
     public const string ref_tbsCertificate
-= @"TBSCertificate  ::=  SEQUENCE  {\n"
-+ @"     version         [0]  Version DEFAULT v1,\n"
-+ @"     serialNumber         CertificateSerialNumber,\n"
-+ @"     signature            AlgorithmIdentifier,\n"
-+ @"     issuer               Name,\n"
-+ @"     validity             Validity,\n"
-+ @"     subject              Name,\n"
-+ @"     subjectPublicKeyInfo SubjectPublicKeyInfo,\n"
-+ @"     issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,\n"
-+ @"                          -- If present, version MUST be v2 or v3\n"
-+ @"     subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,\n"
-+ @"                          -- If present, version MUST be v2 or v3\n"
-+ @"     extensions      [3]  Extensions OPTIONAL\n"
-+ @"                          -- If present, version MUST be v3 --  }\n";
+= "TBSCertificate  ::=  SEQUENCE  {\n"
++ "     version         [0]  Version DEFAULT v1,\n"
++ "     serialNumber         CertificateSerialNumber,\n"
++ "     signature            AlgorithmIdentifier,\n"
++ "     issuer               Name,\n"
++ "     validity             Validity,\n"
++ "     subject              Name,\n"
++ "     subjectPublicKeyInfo SubjectPublicKeyInfo,\n"
++ "     issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,\n"
++ "                          -- If present, version MUST be v2 or v3\n"
++ "     subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,\n"
++ "                          -- If present, version MUST be v2 or v3\n"
++ "     extensions      [3]  Extensions OPTIONAL\n"
++ "                          -- If present, version MUST be v3 --  }\n";
 
     public const string ref_Version
 = @"Version ::= INTEGER { v1(0), v2(1), v3(2) }\n";
@@ -57,14 +58,11 @@ public class ASN1CompilerTests : MonoBehaviour
 
     public void DebugBlock(string test)
     {
-        Match match = Regex.Match(test, Patterns.complexdef);
+        (string ident, string type, string[] lines) = Patterns.EmitBlockDefinition(test);
 
-        GroupCollection gr = match.Groups;
+        string block = string.Join("", lines);
 
-        Debug.Log($"Identifier = {gr["identifier"]}\n"
-            + $"blocklead = {gr["blocklead"]}\n"
-            + $"enumbody = {gr["enumbody"]}\n"
-            + $"structbody = {gr["structbody"]}\n"
-            );
+        Debug.Log($"{type} {ident} = {{\n{block}}};");
     }
+
 }
