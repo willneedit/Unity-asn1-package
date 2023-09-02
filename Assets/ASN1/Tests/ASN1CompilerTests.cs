@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 using ASN1Compiler;
 using System.Text.RegularExpressions;
-using System.Linq;
 
 public class ASN1CompilerTests : MonoBehaviour
 {
@@ -27,6 +24,11 @@ public class ASN1CompilerTests : MonoBehaviour
     public const string ref_Version
 = @"Version ::= INTEGER { v1(0), v2(1), v3(2) }\n";
 
+    public const string ref_pkcs1
+= "   pkcs-1    OBJECT IDENTIFIER ::= {\n"
++ "     iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 1\n"
++ "   }\n";
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +41,9 @@ public class ASN1CompilerTests : MonoBehaviour
 
         DebugBlock(ref_tbsCertificate);
 
-        DebugBlock(ref_Version);
+        // DebugBlock(ref_Version);
+
+        // DebugOID(ref_pkcs1);
     }
 
     public void DebugFielddecl(string test)
@@ -58,11 +62,17 @@ public class ASN1CompilerTests : MonoBehaviour
 
     public void DebugBlock(string test)
     {
-        (string ident, string type, string[] lines) = Patterns.EmitBlockDefinition(test);
+        SequenceParser result = new();
+        result.Parse(test);
 
-        string block = string.Join("", lines);
+        Debug.Log(result);
+    }
 
-        Debug.Log($"{type} {ident} = {{\n{block}}};");
+    public void DebugOID(string test)
+    {
+        (string head, string body, string tail) = Patterns.EmitOIDDefinition(test);
+
+        Debug.Log($"{head}\n{body}{tail}");
     }
 
 }
