@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -276,7 +277,7 @@ namespace ASN1Compiler
             MatchCollection coll = Regex.Matches(match.Groups["body"].Value, oidpart);
             List<string> parts = new();
 
-            foreach(Match match1 in coll)
+            foreach(Match match1 in coll.Cast<Match>())
             {
                 GroupCollection gr = match1.Groups;
                 string str = (string.IsNullOrEmpty(gr["number"].Value))
