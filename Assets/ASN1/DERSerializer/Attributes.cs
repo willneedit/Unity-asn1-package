@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Formats.Asn1;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DERSerializer
 {
@@ -17,19 +13,35 @@ namespace DERSerializer
     public class ASN1TagAttribute : Attribute
     {
         public TagClass tagClass;
-        public int number;
+        public int number = -1;
+        public bool optional;
 
         // Tag Class, Tag Number
-        public ASN1TagAttribute(TagClass tagClass, int number)
+        public ASN1TagAttribute(TagClass tagClass, int number, bool optional = false)
         {
             this.tagClass = tagClass;
             this.number = number;
-
-            if(tagClass == TagClass.Universal) throw new ArgumentException("Use Tag class other than Universal");
+            this.optional = optional;
         }
 
         // Tag Number only
-        public ASN1TagAttribute(int number) { tagClass = TagClass.ContextSpecific; this.number = number; }
-    }
+        public ASN1TagAttribute(int number, bool optional = false)
+        {
+            tagClass = TagClass.ContextSpecific;
+            this.number = number; 
+            this.optional = optional;
+        }
 
+        public ASN1TagAttribute(bool optional = false)
+        {
+            this.optional = optional;
+        }
+
+        public static implicit operator Asn1Tag?(ASN1TagAttribute attrs)
+        {
+            return attrs != null && attrs.number < 0
+                    ? new Asn1Tag(attrs.tagClass, attrs.number)
+                    : null;
+        }
+    }
 }

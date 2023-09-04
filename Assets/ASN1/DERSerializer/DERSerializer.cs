@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Numerics;
 using System.Reflection;
@@ -11,7 +12,7 @@ namespace DERSerializer
 {
     public class Serializer
     {
-        private static (Type type, bool optional) GetOptionalType(Type t)
+        public static (Type type, bool optional) GetOptionalType(Type t)
         {
             Type t2 = Nullable.GetUnderlyingType(t);
             return t2 == null
@@ -24,28 +25,48 @@ namespace DERSerializer
         {
             if(item == null) return;
 
-            Asn1Tag? tag = attrs != null
-                    ? new Asn1Tag(attrs.tagClass, attrs.number)
-                    : null;
+            Asn1Tag? tag = attrs;
 
-            if(item is int i) writer.WriteInteger(i, tag);
+            if(item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))
+                EmitCollection(writer, item, tag);
+            else if(item is int i) writer.WriteInteger(i, tag);
             else if(item is long l) writer.WriteInteger(l, tag);
             else if(item is BigInteger bi) writer.WriteInteger(bi, tag);
             else if(item is byte[] ba) writer.WriteOctetString(ba, tag);
             else if(item is string s) writer.WriteCharacterString(UniversalTagNumber.UTF8String, s, tag);
-            else
-            {
-                Type t = item.GetType();
-                if(t.IsStruct())
-                    EmitStruct(writer, item, t, tag);
-            }
+            else if(item.GetType().IsStruct()) EmitStruct(writer, item, item.GetType(), tag);
+            else throw new NotImplementedException($"{item.GetType().Name} is unsupported");
         }
 
-        public static void EmitStruct<T>(AsnWriter writer, T @struct, Type type = null, Asn1Tag? tag = null)
+        private static void EmitCollection(AsnWriter writer, object collection, Asn1Tag? tag = null)
         {
             writer.PushSequence(tag);
 
-            if(type == null) type = typeof(T);
+            ForEachObj(collection, (o) => EmitOneItem(writer, o));
+
+            writer.PopSequence(tag);
+        }
+
+        /// <summary>
+        /// Recreation of foreach, being type agnostic
+        /// </summary>
+        /// <param name="collection">Collection, implementing GetEnumerator()</param>
+        /// <param name="action">The action to act on for the elements</param>
+        private static void ForEachObj(object collection, Action<object> action)
+        {
+            MethodInfo mi = collection.GetType().GetRuntimeMethod("GetEnumerator", new Type[0]);
+            object enumerator = mi.Invoke(collection, new object[0]);
+
+            PropertyInfo e_current = enumerator.GetType().GetRuntimeProperty("Current");
+            MethodInfo e_movenext = enumerator.GetType().GetRuntimeMethod("MoveNext", new Type[0]);
+
+            while((e_movenext.Invoke(enumerator, new object[0]) as bool?) ?? false)
+                action(e_current.GetValue(enumerator));
+        }
+
+        private static void EmitStruct(AsnWriter writer, object @struct, Type type, Asn1Tag? tag = null)
+        {
+            writer.PushSequence(tag);
 
             foreach(FieldInfo field in type.GetFields(BindingFlags.Instance |
                                                  BindingFlags.NonPublic |
@@ -68,14 +89,5 @@ namespace DERSerializer
             }
             Debug.Log(sb.ToString());
         }
-    }
-
-
-    [DERSerializable]
-    public struct Foo
-    {
-        [ASN1Tag(0)]
-        int bar;
-        int? baz;
     }
 }
