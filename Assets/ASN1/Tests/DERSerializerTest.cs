@@ -15,9 +15,10 @@ public class DERSerializerTest : MonoBehaviour
 
     public struct s
     {
-        public List<object> coll;
+        [ASN1Tag(0)]
+        public List<int> coll;
         public int i1;
-        [ASN1Tag(0, true)]
+        [ASN1Tag(1, true)]
         public long? l1;
         public string s1;
         public byte[] b1;
@@ -33,11 +34,11 @@ public class DERSerializerTest : MonoBehaviour
         {
             coll = new()
             {
-                1, 2, 4, 8, 16, 32, 64, 128, 256, "Surprise!", 2048
+                1, 2, 4, 8, 16, 32, 64, 128, 256, 1024, 2048
             },
 
             i1 = 1234,
-            l1 = 56,
+            l1 = 567890,
             s1 = "foo bar baz",
             b1 = bytes,
             s0 = new()
@@ -47,11 +48,12 @@ public class DERSerializerTest : MonoBehaviour
             }
         };
 
-        AsnWriter writer = new(AsnEncodingRules.DER);
-        Serializer.EmitOneItem(writer, struc);
+        byte[] output = Serializer.Serialize(struc);
 
-        Serializer.DebugWriter(writer);
+        Debug.Log(Serializer.Hexdump(output));
 
+        s s1 = Serializer.Deserialize<s>(output);
+        Debug.Log($"{s1}");
     }
 }
  

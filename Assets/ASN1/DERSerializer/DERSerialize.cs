@@ -6,13 +6,12 @@ using System.Reflection;
 using System.Text;
 using Unity.VisualScripting;
 
-using Debug = UnityEngine.Debug;
 
 namespace DERSerializer
 {
-    public class Serializer
+    public partial class Serializer
     {
-        public static (Type type, bool optional) GetOptionalType(Type t)
+        private static (Type type, bool optional) GetOptionalType(Type t)
         {
             Type t2 = Nullable.GetUnderlyingType(t);
             return t2 == null
@@ -21,7 +20,7 @@ namespace DERSerializer
         }
 
 
-        public static void EmitOneItem(AsnWriter writer, object item, ASN1TagAttribute attrs = null)
+        private static void EmitOneItem(AsnWriter writer, object item, ASN1TagAttribute attrs = null)
         {
             if(item == null) return;
 
@@ -34,7 +33,7 @@ namespace DERSerializer
             else if(item is BigInteger bi) writer.WriteInteger(bi, tag);
             else if(item is byte[] ba) writer.WriteOctetString(ba, tag);
             else if(item is string s) writer.WriteCharacterString(UniversalTagNumber.UTF8String, s, tag);
-            else if(item.GetType().IsStruct()) EmitStruct(writer, item, item.GetType(), tag);
+            else if(item.GetType().IsStruct()) EmitStruct(writer, item, tag);
             else throw new NotImplementedException($"{item.GetType().Name} is unsupported");
         }
 
@@ -47,6 +46,16 @@ namespace DERSerializer
             writer.PopSequence(tag);
         }
 
+        private static void EmitStruct(AsnWriter writer, object @struct, Asn1Tag? tag = null)
+        {
+            writer.PushSequence(tag);
+
+            ForEachStructFields(@struct, (sfv, ta) => EmitOneItem(writer, sfv, ta));
+
+            writer.PopSequence(tag);
+
+        }
+
         /// <summary>
         /// Recreation of foreach, being type agnostic
         /// </summary>
@@ -57,37 +66,52 @@ namespace DERSerializer
             MethodInfo mi = collection.GetType().GetRuntimeMethod("GetEnumerator", new Type[0]);
             object enumerator = mi.Invoke(collection, new object[0]);
 
-            PropertyInfo e_current = enumerator.GetType().GetRuntimeProperty("Current");
-            MethodInfo e_movenext = enumerator.GetType().GetRuntimeMethod("MoveNext", new Type[0]);
+            Type type = enumerator.GetType();
+            PropertyInfo e_current = type.GetRuntimeProperty("Current");
+            MethodInfo e_movenext = type.GetRuntimeMethod("MoveNext", new Type[0]);
 
             while((e_movenext.Invoke(enumerator, new object[0]) as bool?) ?? false)
                 action(e_current.GetValue(enumerator));
         }
 
-        private static void EmitStruct(AsnWriter writer, object @struct, Type type, Asn1Tag? tag = null)
+        /// <summary>
+        /// Do something over all public structure fields
+        /// </summary>
+        /// <param name="struct">The struct to act on for the fields</param>
+        /// <param name="action">The action to act</param>
+        /// 
+        private static void ForEachStructFields(object @struct, Action<object, ASN1TagAttribute> action)
         {
-            writer.PushSequence(tag);
-
-            foreach(FieldInfo field in type.GetFields(BindingFlags.Instance |
-                                                 BindingFlags.NonPublic |
-                                                 BindingFlags.Public))
+            foreach(FieldInfo field in @struct.GetType()
+                .GetFields(BindingFlags.Instance |
+                // BindingFlags.NonPublic |
+                BindingFlags.Public))
             {
-
-                EmitOneItem(writer, field.GetValue(@struct), field.GetCustomAttribute<ASN1TagAttribute>());
+                action(field.GetValue(@struct), field.GetCustomAttribute<ASN1TagAttribute>());
             }
-                
-            writer.PopSequence(tag);
         }
-        public static void DebugWriter(AsnWriter writer)
+
+        public static byte[] Serialize(object obj)
         {
-            byte[] output = writer.Encode();
+            AsnWriter writer = new(AsnEncodingRules.DER);
+            EmitOneItem(writer, obj);
+
+            return writer.Encode();
+        }
+
+        public static string Hexdump(byte[] output)
+        {
             StringBuilder sb = new();
+            int i = 0;
             foreach(byte v in output)
             {
                 sb.Append(v.ToString("X2"));
-                sb.Append(" ");
+                i++;
+                if((i % 16)== 0) sb.Append("  ");
+                if((i % 32) == 0) sb.Append("\n");
+                else sb.Append(" ");
             }
-            Debug.Log(sb.ToString());
+            return sb.ToString();
         }
     }
 }

@@ -39,7 +39,7 @@ namespace DERSerializer
 
         public static implicit operator Asn1Tag?(ASN1TagAttribute attrs)
         {
-            return attrs != null && attrs.number < 0
+            return attrs != null && attrs.number >= 0
                     ? new Asn1Tag(attrs.tagClass, attrs.number)
                     : null;
         }
