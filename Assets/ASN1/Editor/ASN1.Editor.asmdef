@@ -1,0 +1,16 @@
+{
+    "name": "ASN1.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b21cbe13e102e9549af603f0d7a607c3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

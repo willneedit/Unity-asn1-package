@@ -1,0 +1,18 @@
+{
+    "name": "ASN1.Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b21cbe13e102e9549af603f0d7a607c3",
+        "GUID:9275f1e1350004248af1a3f032dc20f2",
+        "GUID:c2884a0457503d04799bac35fa3637b4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
