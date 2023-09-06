@@ -98,11 +98,10 @@ namespace DERSerializer
             return item;
         }
 
-        public static T Deserialize<T>(ReadOnlyMemory<byte> der) where T : new()
+        public static T Deserialize<T>(ReadOnlyMemory<byte> der)
         {
-            object item = new T();
             AsnReader reader = new(der, AsnEncodingRules.DER);
-            item = ReadOneItem(reader, typeof(T));
+            object item = ReadOneItem(reader, typeof(T));
             return (T) item;
         }
     }
