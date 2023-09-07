@@ -7,6 +7,14 @@ using DERSerializer;
 
 public class DERSerializerTest : MonoBehaviour
 {
+    public enum Status
+    {
+        OK = 200,
+        NotFound = 404,
+        Forbidden = 403,
+        ServerError = 500,
+    }
+
     public struct s0
     {
         public int i01;
@@ -17,11 +25,14 @@ public class DERSerializerTest : MonoBehaviour
     {
         [ASN1Tag(0)]
         public List<int> coll;
-        public int i1;
         [ASN1Tag(1, true)]
+        public Status status;
+        public bool b1;
+        public int i1;
+        [ASN1Tag(2, true)]
         public long? l1;
         public string s1;
-        public byte[] b1;
+        public byte[] ba1;
 
         [ASN1Tag(tagClass: TagClass.Application,  number: 1, optional: false)]
         public s0 s0;
@@ -37,10 +48,12 @@ public class DERSerializerTest : MonoBehaviour
                 1, 2, 4, 8, 16, 32, 64, 128, 256, 1024, 2048
             },
 
+            b1 = true,
+            status = Status.NotFound,
             i1 = 1234,
             l1 = 567890,
             s1 = "foo bar baz",
-            b1 = bytes,
+            ba1 = bytes,
             s0 = new()
             {
                 i01 = -1,

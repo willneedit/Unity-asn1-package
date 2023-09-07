@@ -35,31 +35,60 @@ namespace DERSerializer
                 Asn1Tag inferred = tag ?? Asn1Tag.Null;
                 if(attrs == null || attrs.number < 0)
                 {
-                    if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
-                        inferred = new(UniversalTagNumber.Sequence);
-                    else if(type == typeof(int) || type == typeof(long) || type == typeof(BigInteger))
-                        inferred = new(UniversalTagNumber.Integer);
-                    else if(type == typeof(byte[]))
-                        inferred = new(UniversalTagNumber.OctetString);
-                    else if(type == typeof(string))
-                        inferred = new(UniversalTagNumber.UTF8String);
-                    else if(type.IsStruct())
-                        inferred = new(UniversalTagNumber.Sequence);
+                    if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) inferred = new(UniversalTagNumber.Sequence);
+                    else if(type.IsEnum) inferred = new(UniversalTagNumber.Enumerated);
+                    else if(type == typeof(bool)) inferred = new(UniversalTagNumber.Boolean);
+                    else if(type == typeof(int) || type == typeof(long) || type == typeof(BigInteger)) inferred = new(UniversalTagNumber.Integer);
+                    else if(type == typeof(byte[])) inferred = new(UniversalTagNumber.OctetString);
+                    else if(type == typeof(string)) inferred = new(UniversalTagNumber.UTF8String);
+                    else if(type.IsStruct()) inferred = new(UniversalTagNumber.Sequence);
                 }
 
                 // Move to the next field as it seems to be missing because it's optional.
                 if(!reader.PeekTag().HasSameClassAndValue(inferred)) return null;
             }
 
-            object item = null;
-            if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) item = ReadCollection(reader, type, tag);
-            else if(type == typeof(long)) { reader.TryReadInt64(out long l, tag); item = l; }
-            else if(type == typeof(int)) { reader.TryReadInt32(out int i, tag); item = i; }
-            else if(type == typeof(BigInteger)) item = reader.ReadInteger(tag);
-            else if(type == typeof(byte[])) item = reader.ReadOctetString(tag);
-            else if(type == typeof(string)) item = reader.ReadCharacterString(UniversalTagNumber.UTF8String, tag);
-            else if(type.IsStruct()) item = ReadStruct(reader, type, tag);
-            else throw new NotImplementedException($"{type.Name} is unsupported");
+            object item;
+            if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                item = ReadCollection(reader, type, tag);
+            }
+            else if(type.IsEnum)
+            {
+                item = reader.ReadEnumeratedValue(type, tag);
+            }
+            else if(type == typeof(bool))
+            {
+                item = reader.ReadBoolean(tag);
+            }
+            else if(type == typeof(long))
+            { 
+                reader.TryReadInt64(out long l, tag); item = l; 
+            }
+            else if(type == typeof(int))
+            {
+                reader.TryReadInt32(out int i, tag); item = i; 
+            }
+            else if(type == typeof(BigInteger))
+            {
+                item = reader.ReadInteger(tag);
+            }
+            else if(type == typeof(byte[]))
+            {
+                item = reader.ReadOctetString(tag);
+            }
+            else if(type == typeof(string))
+            {
+                item = reader.ReadCharacterString(UniversalTagNumber.UTF8String, tag);
+            }
+            else if(type.IsStruct())
+            {
+                item = ReadStruct(reader, type, tag);
+            }
+            else
+            {
+                throw new NotImplementedException($"{type.Name} is unsupported");
+            }
 
             return item;
         }
