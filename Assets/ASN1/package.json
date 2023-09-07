@@ -1,7 +1,7 @@
 {
   "name": "com.willneedit.asn1",
   "displayName": "ASN.1 decoder/encoder",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "unity": "2021.3",
   "description": "ASN.1 decoder and encoder for common uses, like space efficient and portable serialization",
   "repository": {
