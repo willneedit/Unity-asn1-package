@@ -34,6 +34,7 @@ public class DERSerializerTest : MonoBehaviour
         public string s1;
         public byte[] ba1;
         public uint ui1;
+        [ASN1Tag(true)]
         public ulong ul2;
 
         [ASN1Tag(tagClass: TagClass.Application,  number: 1, optional: false)]

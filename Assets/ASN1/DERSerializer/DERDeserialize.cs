@@ -38,6 +38,7 @@ namespace DERSerializer
                     if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) inferred = new(UniversalTagNumber.Sequence);
                     else if(type.IsEnum) inferred = new(UniversalTagNumber.Enumerated);
                     else if(type == typeof(bool)) inferred = new(UniversalTagNumber.Boolean);
+                    else if(type == typeof(uint) || type == typeof(ulong)) inferred = new(UniversalTagNumber.Integer);
                     else if(type == typeof(int) || type == typeof(long) || type == typeof(BigInteger)) inferred = new(UniversalTagNumber.Integer);
                     else if(type == typeof(byte[])) inferred = new(UniversalTagNumber.OctetString);
                     else if(type == typeof(string)) inferred = new(UniversalTagNumber.UTF8String);
