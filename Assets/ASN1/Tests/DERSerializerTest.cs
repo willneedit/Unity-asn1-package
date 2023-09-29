@@ -33,6 +33,8 @@ public class DERSerializerTest : MonoBehaviour
         public long? l1;
         public string s1;
         public byte[] ba1;
+        public uint ui1;
+        public ulong ul2;
 
         [ASN1Tag(tagClass: TagClass.Application,  number: 1, optional: false)]
         public s0 s0;
@@ -58,7 +60,10 @@ public class DERSerializerTest : MonoBehaviour
             {
                 i01 = -1,
                 s01 = "illegal"
-            }
+            },
+            ui1 = (uint) (((ulong)1 << 32) - 1),
+            ul2 = ((ulong)1 << 63) + 1,
+
         };
 
         byte[] output = Serializer.Serialize(struc);

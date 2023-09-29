@@ -61,15 +61,23 @@ namespace DERSerializer
             {
                 item = reader.ReadBoolean(tag);
             }
-            else if(type == typeof(long))
+            else if(type == typeof(ulong))
             { 
-                reader.TryReadInt64(out long l, tag); item = l; 
+                reader.TryReadUInt64(out ulong l, tag); item = l; 
             }
-            else if(type == typeof(int))
+            else if(type == typeof(uint))
             {
-                reader.TryReadInt32(out int i, tag); item = i; 
+                reader.TryReadUInt32(out uint i, tag); item = i; 
             }
-            else if(type == typeof(BigInteger))
+            else if (type == typeof(long))
+            {
+                reader.TryReadInt64(out long l, tag); item = l;
+            }
+            else if (type == typeof(int))
+            {
+                reader.TryReadInt32(out int i, tag); item = i;
+            }
+            else if (type == typeof(BigInteger))
             {
                 item = reader.ReadInteger(tag);
             }
