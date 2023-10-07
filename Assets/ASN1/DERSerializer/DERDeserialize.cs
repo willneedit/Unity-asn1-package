@@ -21,15 +21,17 @@ namespace DERSerializer
         }
 #endif
 
-        private static object ReadOneItem(AsnReader reader, Type type, ASN1TagAttribute attrs = null)
+        private static object ReadOneItem(AsnReader reader, Type typeBase, ASN1TagAttribute attrs = null)
         {
-            bool optional;
-            (type, optional) = GetOptionalType(type);
+            (Type type, bool optional) = GetOptionalType(typeBase);
             optional |= attrs?.optional ?? false;
             Asn1Tag? tag = attrs;
 
             if(optional)
             {
+                if (!typeBase.IsNullable() && typeBase.IsValueType)
+                    throw new ArgumentException($"{type.Name} is not nullable where the field is supposed to be optional");
+
                 // If the struct field attribute is absent, infer the universal tag number
                 // from the field type.
                 Asn1Tag inferred = tag ?? Asn1Tag.Null;
