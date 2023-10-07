@@ -46,7 +46,7 @@ namespace DERSerializer
                 }
 
                 // Move to the next field as it seems to be missing because it's optional.
-                if(!reader.PeekTag().HasSameClassAndValue(inferred)) return null;
+                if(!reader.HasData || !reader.PeekTag().HasSameClassAndValue(inferred)) return null;
             }
 
             object item;

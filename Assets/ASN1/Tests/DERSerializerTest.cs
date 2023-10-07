@@ -34,11 +34,12 @@ public class DERSerializerTest : MonoBehaviour
         public string s1;
         public byte[] ba1;
         public uint ui1;
-        [ASN1Tag(true)]
-        public ulong ul2;
 
         [ASN1Tag(tagClass: TagClass.Application,  number: 1, optional: false)]
         public s0 s0;
+
+        [ASN1Tag(true)]
+        public ulong? ul2;
     }
     // Start is called before the first frame update
     void Start()
@@ -62,9 +63,9 @@ public class DERSerializerTest : MonoBehaviour
                 i01 = -1,
                 s01 = "illegal"
             },
-            ui1 = (uint) (((ulong)1 << 32) - 1),
+            ui1 = (uint)(((ulong)1 << 32) - 1),
             ul2 = ((ulong)1 << 63) + 1,
-
+            // ul2 = null
         };
 
         byte[] output = Serializer.Serialize(struc);
