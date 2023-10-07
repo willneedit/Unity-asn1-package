@@ -2,7 +2,6 @@
 using System.Formats.Asn1;
 using System.Numerics;
 using System;
-using Unity.VisualScripting;
 using System.Reflection;
 
 namespace DERSerializer
@@ -29,7 +28,7 @@ namespace DERSerializer
 
             if(optional)
             {
-                if (!typeBase.IsNullable() && typeBase.IsValueType)
+                if ((Nullable.GetUnderlyingType(typeBase) == null) && typeBase.IsValueType)
                     throw new ArgumentException($"{type.Name} is not nullable where the field is supposed to be optional");
 
                 // If the struct field attribute is absent, infer the universal tag number
@@ -44,7 +43,7 @@ namespace DERSerializer
                     else if(type == typeof(int) || type == typeof(long) || type == typeof(BigInteger)) inferred = new(UniversalTagNumber.Integer);
                     else if(type == typeof(byte[])) inferred = new(UniversalTagNumber.OctetString);
                     else if(type == typeof(string)) inferred = new(UniversalTagNumber.UTF8String);
-                    else if(type.IsStruct()) inferred = new(UniversalTagNumber.Sequence);
+                    else if(!type.IsPrimitive) inferred = new(UniversalTagNumber.Sequence);
                 }
 
                 // Move to the next field as it seems to be missing because it's optional.
@@ -92,7 +91,7 @@ namespace DERSerializer
             {
                 item = reader.ReadCharacterString(UniversalTagNumber.UTF8String, tag);
             }
-            else if(type.IsStruct())
+            else if(!type.IsPrimitive)
             {
                 item = ReadStruct(reader, type, tag);
             }

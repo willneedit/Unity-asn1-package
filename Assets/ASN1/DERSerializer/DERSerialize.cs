@@ -4,7 +4,6 @@ using System.Formats.Asn1;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
-using Unity.VisualScripting;
 
 
 namespace DERSerializer
@@ -37,7 +36,7 @@ namespace DERSerializer
             else if(item is BigInteger bi) writer.WriteInteger(bi, tag);
             else if(item is byte[] ba) writer.WriteOctetString(ba, tag);
             else if(item is string s) writer.WriteCharacterString(UniversalTagNumber.UTF8String, s, tag);
-            else if(item.GetType().IsStruct()) EmitStruct(writer, item, tag);
+            else if(!item.GetType().IsPrimitive) EmitStruct(writer, item, tag);
             else throw new NotImplementedException($"{item.GetType().Name} is unsupported");
         }
 

@@ -15,7 +15,7 @@ public class DERSerializerTest : MonoBehaviour
         ServerError = 500,
     }
 
-    public struct s0
+    public class s0
     {
         public int i01;
         public string s01;
