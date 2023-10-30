@@ -34,6 +34,7 @@ namespace DERSerializer
             else if(item is int i) writer.WriteInteger(i, tag);
             else if(item is long l) writer.WriteInteger(l, tag);
             else if(item is BigInteger bi) writer.WriteInteger(bi, tag);
+            else if(item is DateTime dt) writer.WriteUtcTime(dt, tag);
             else if(item is byte[] ba) writer.WriteOctetString(ba, tag);
             else if(item is string s) writer.WriteCharacterString(UniversalTagNumber.UTF8String, s, tag);
             else if(!item.GetType().IsPrimitive) EmitStruct(writer, item, tag);

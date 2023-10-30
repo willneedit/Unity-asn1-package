@@ -41,6 +41,7 @@ namespace DERSerializer
                     else if(type == typeof(bool)) inferred = new(UniversalTagNumber.Boolean);
                     else if(type == typeof(uint) || type == typeof(ulong)) inferred = new(UniversalTagNumber.Integer);
                     else if(type == typeof(int) || type == typeof(long) || type == typeof(BigInteger)) inferred = new(UniversalTagNumber.Integer);
+                    else if(type == typeof(DateTime)) inferred = new(UniversalTagNumber.UtcTime);
                     else if(type == typeof(byte[])) inferred = new(UniversalTagNumber.OctetString);
                     else if(type == typeof(string)) inferred = new(UniversalTagNumber.UTF8String);
                     else if(!type.IsPrimitive) inferred = new(UniversalTagNumber.Sequence);
@@ -82,6 +83,10 @@ namespace DERSerializer
             else if (type == typeof(BigInteger))
             {
                 item = reader.ReadInteger(tag);
+            }
+            else if (type == typeof(DateTime))
+            {
+                item = reader.ReadUtcTime(tag).DateTime;
             }
             else if(type == typeof(byte[]))
             {

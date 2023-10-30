@@ -4,6 +4,7 @@ using UnityEngine;
 
 using System.Formats.Asn1;
 using DERSerializer;
+using System;
 
 public class DERSerializerTest : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class DERSerializerTest : MonoBehaviour
     {
         public int i01;
         public string s01;
+        public DateTime dt;
     };
 
     public struct s
@@ -61,7 +63,8 @@ public class DERSerializerTest : MonoBehaviour
             s0 = new()
             {
                 i01 = -1,
-                s01 = "illegal"
+                s01 = "illegal",
+                dt = DateTime.Now - TimeSpan.FromDays(30),
             },
             ui1 = (uint)(((ulong)1 << 32) - 1),
             ul2 = ((ulong)1 << 63) + 1,
