@@ -28,7 +28,7 @@ namespace DERSerializer
             if(item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))
                 EmitCollection(writer, item, tag);
             else if(item is Enum e) writer.WriteEnumeratedValue(e, tag);
-            else if(item is bool b) writer.WriteBoolean(b);
+            else if(item is bool b) writer.WriteBoolean(b, tag);
             else if(item is uint ui) writer.WriteInteger(ui, tag);
             else if(item is ulong ul) writer.WriteInteger(ul, tag);
             else if(item is int i) writer.WriteInteger(i, tag);

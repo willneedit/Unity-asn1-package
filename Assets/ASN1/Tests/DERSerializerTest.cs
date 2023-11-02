@@ -29,7 +29,8 @@ public class DERSerializerTest : MonoBehaviour
         public List<int> coll;
         [ASN1Tag(1, true)]
         public Status? status;
-        public bool b1;
+        [ASN1Tag(19, true)]
+        public bool? b1;
         public int i1;
         [ASN1Tag(2, true)]
         public long? l1;
